@@ -22,6 +22,10 @@ export default class RunestoneBase {
     constructor(opts) {
         this.component_ready_promise = new Promise(resolve => this._component_ready_resolve_fn = resolve)
         this.optional = false;
+        if (typeof window.allComponents === "undefined") {
+            window.allComponents = [];
+        }
+        window.allComponents.push(this);
         if (opts) {
             this.sid = opts.sid;
             this.graderactive = opts.graderactive;
@@ -343,6 +347,19 @@ export default class RunestoneBase {
             "Each component should provide an implementation of disableInteraction"
         );
     }
+
+    toString() {
+        return `${this.constructor.name}: ${this.divid}`
+    }
+
+    queueMathJax(component) {
+        if (MathJax.version.substring(0, 1) === "2") {
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub, component]);
+        } else {
+            MathJax.typesetPromise([component])
+        }
+    }
+
 }
 
 window.RunestoneBase = RunestoneBase;
